@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "prefabPath": "/Users/pooja/.gradle/caches/modules-2/files-2.1/com.google.prefab/cli/2.0.0/f2702b5ca13df54e3ca92f29d6b403fb6285d8df/cli-2.0.0-all.jar",
+  "packages": [
+    "/Users/pooja/.gradle/caches/transforms-3/4e1dff1da1ad5e7684f634a27e7b4629/transformed/jetified-react-android-0.74.0-debug/prefab",
+    "/Users/pooja/.gradle/caches/transforms-3/714a28169c221dd471f2c84a0c964f2f/transformed/jetified-fbjni-0.6.0/prefab",
+    "/Users/pooja/.gradle/caches/transforms-3/ba5e888a3197a3b53f2bd32f09b0df6e/transformed/jetified-hermes-android-0.74.0-debug/prefab",
+    "/Users/pooja/CallingApp/ParkwithQR/node_modules/react-native-reanimated/android/build/intermediates/prefab_package/debug/prefab"
+  ]
+}
