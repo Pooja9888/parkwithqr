@@ -1,0 +1,146 @@
+import React, { useState } from 'react';
+import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { launchCamera } from 'react-native-image-picker';
+
+const PucForm = ({navigation}) => {
+  const [name, setName] = useState('');
+  const [pucCode, setPucCode] = useState('');
+  const [validity, setValidity] = useState('');
+  const [photoUri, setPhotoUri] = useState(null);
+
+  const openCamera = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        saveToPhotos: true,
+        cameraType: 'back',
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled camera');
+        } else if (response.errorCode) {
+          console.log('Camera Error: ', response.errorMessage);
+        } else {
+          // response.assets is an array, take first asset's uri
+          const uri = response.assets && response.assets[0].uri;
+          setPhotoUri(uri);
+        }
+      }
+    );
+  };
+  handleButton=()=>{
+    navigation.navigate('EditForm');
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter name"
+          placeholderTextColor="#999"
+          value={name}
+          onChangeText={setName}
+          returnKeyType="next"
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>PUC Code</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter PUC code"
+          placeholderTextColor="#999"
+          value={pucCode}
+          onChangeText={setPucCode}
+          autoCapitalize="characters"
+          returnKeyType="next"
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Validity Up To</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter validity date"
+          placeholderTextColor="#999"
+          value={validity}
+          onChangeText={setValidity}
+          returnKeyType="done"
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Front Photo</Text>
+        <TouchableOpacity onPress={openCamera} activeOpacity={0.7}>
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.photo} />
+          ) : (
+            <View style={[styles.input, styles.photoPlaceholder]}>
+              <Text style={{ color: '#999' }}>Tap to open camera</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.btnBox} onPress={handleButton}>
+        <Text style={styles.btnText}>Submit</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow:1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  inputGroup: {
+    marginBottom: 25,
+  },
+  label: {
+    fontSize: 16,
+    color: '#5F259F',
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  input: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    color: '#222',
+  },
+  photo: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  photoPlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+  },
+  btnBox: {
+    backgroundColor: '#5F259F',
+    padding:20,
+    borderRadius:20,
+    alignItems: 'center',
+    top:25
+  },
+  btnText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+   
+  }
+});
+
+export default PucForm;
