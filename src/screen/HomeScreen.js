@@ -17,6 +17,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import walletService from '../services/walletService';
 import asyncStorage from '../generic/storage';
 import Toast from 'react-native-toast-message';
+import documentService from '../services/documentService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,6 +35,7 @@ const data = [
   { id: '3', image: images.insurance, title: 'Insurance', link: 'https://financialservices.gov.in/beta/en/public-sector-insurers' },
   { id: '4', image: images.drivingLicence, title: 'Driving Licence', link: 'https://parivahan.gov.in/parivahan//en/content/driving-licence-0' },
   { id: '5', image: images.vehicleDoc, title: 'RC', link: 'https://parivahan.gov.in/parivahan//en/content/vehicle-registration' },
+  { id: '6', image: images.vehicleService, title: 'Services', link: 'https://parivahan.gov.in/parivahan//en/content/vehicle-registration' },
 ];
 
 const HomeScreen = ({ route, navigation }) => {
@@ -57,7 +59,6 @@ const HomeScreen = ({ route, navigation }) => {
     React.useCallback(() => {
       if (route?.params?.showEmergencyPopup) {
         setEmergencyModalVisible(true);
-        // Reset the route parameter after triggering the modal
         navigation.setParams({ showEmergencyPopup: false });
       }
     }, [route?.params?.showEmergencyPopup])
@@ -111,6 +112,34 @@ const HomeScreen = ({ route, navigation }) => {
     fetchWalletBalance();
   }, []);
 
+//  const fetchDocuments = async () => {
+//     try {
+//       const response = await documentService.updateConfig();
+//       const docs = response.data.docs || [];
+//       console.log(docs, "docs array");
+//       const handleDocType = (type, previewScreen, addScreen) => {
+//         const doc = docs.find(d => d.type === type);
+//         if (doc) {
+//           navigation.navigate(addScreen, { doc }); // pass doc to preview
+//         } else {
+//           navigation.navigate(addScreen);
+//         }
+//       };
+
+//       handleDocType('puc', 'PreviewPuc', 'PucForm');
+//       handleDocType('rc', 'PreviewRc', 'RcForm');
+//       handleDocType('insurance', 'PreviewInsurance', 'InsuranceForm');
+//       handleDocType('driving', 'PreviewDrivingLicence', 'DrivingLicenceForm');
+//       handleDocType('service', 'PreviewDrivingLicence', 'DrivingLicenceForm');
+//     } catch (error) {
+//       console.error("Error fetching wallet balance:", error);
+//     } 
+//   };
+
+  // useEffect(() => {
+  //   fetchDocuments();
+  // }, []);
+
   useFocusEffect(
     React.useCallback(() => {
       fetchWalletBalance();
@@ -145,30 +174,42 @@ const HomeScreen = ({ route, navigation }) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.listBox}
-      onPress={() => {
-        if (item.title === 'PUC') {
-          navigation.navigate('PucForm');
-        } 
-        else if(item.title === 'Insurance'){
-          navigation.navigate('InsuranceForm');
-        }
-        else if(item.title === 'Driving Licence'){
-          navigation.navigate('DrivingLicenceForm');
-        }
-        else if(item.title === 'RC'){
-          navigation.navigate('RcForm');
-        }
-        else {
-          Linking.openURL(item.link).catch((err) =>
-            console.error('Failed to open link', err)
-          );
-        }
-      }}
+      onPress={fetchDocumentsAndNavigate.bind(null, item.title)}
     >
       <Image style={styles.image} source={item.image} />
       <Text style={styles.title}>{item.title}</Text>
     </TouchableOpacity>
   );
+  
+  const fetchDocumentsAndNavigate = async (title) => {
+    const typeMap = {
+      PUC:     { type: 'puc',    preview: 'PreviewPuc', add: 'PucForm' },
+      RC:      { type: 'rc',     preview: 'PreviewRc', add: 'RcForm' },
+      Insurance: { type: 'insurance', preview: 'PreviewInsurance', add: 'InsuranceForm' },
+      'Driving Licence': { type: 'driving', preview: 'PreviewDrivingLicence', add: 'DrivingLicenceForm' },
+      'Services': { type: 'service', preview: 'PreviewService', add: 'ServiceForm' }
+    };
+  
+    const { type, preview, add } = typeMap[title] || {};
+    if (!type) {
+      return Linking.openURL(item.link).catch(console.error);
+    }
+  
+    try {
+      const response = await documentService.updateConfig();
+      const docs = response.data.docs || [];
+      const doc = docs.find(d => d.type === type);
+      
+      if (doc) {
+        navigation.navigate(preview, { doc });
+      } else {
+        navigation.navigate(add);
+      }
+    } catch (err) {
+      console.error("Doc fetch error:", err);
+      showToast("Error checking documents", "error");
+    }
+  };
   if (isLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>

@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Image,Alert } from 'react-native';
+import React, { useState ,useEffect} from 'react';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Platform,
+} from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
 import { requestCameraPermission } from '../utils/cameraPermission';
 import documentService from '../services/documentService';
+import { enviournment } from '../generic/enviournment';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { genericEnum } from '../generic/genericEnum';
-import { axiosGetToken } from '../services/axiosService';
-import { webUrl } from '../generic/webUrl';
-import moment from 'moment';
+import moment from 'moment'; 
 
-const PucForm = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const [validity, setValidity] = useState('');
+const EditInsuranceForm = ({ navigation, route }) => {
+  const { doc } = route.params;
+
+  const [name, setName] = useState(doc?.name || '');
+  const [number, setNumber] = useState(doc?.number || '');
+  const [validity, setValidity] = useState(doc?.vaild_till || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [photoUri, setPhotoUri] = useState(null);
+  const [photoUri, setPhotoUri] = useState(doc?.front || '');
 
   const openCamera = async () => {
     const hasPermission = await requestCameraPermission();
@@ -22,6 +32,7 @@ const PucForm = ({navigation}) => {
       Alert.alert('Permission Denied', 'Camera access is required to take photos.');
       return;
     }
+
     launchCamera(
       {
         mediaType: 'photo',
@@ -35,48 +46,51 @@ const PucForm = ({navigation}) => {
           console.log('Camera Error: ', response.errorMessage);
         } else {
           const uri = response.assets && response.assets[0].uri;
-          setPhotoUri(uri);
+          if (uri) setPhotoUri(uri);
         }
       }
     );
   };
-  handleButton= async ()=>{
-    const formattedDate = moment(validity, 'DD-MM-YYYY').format('YYYY-MM-DD');
-
-    const param ={
-      'name':name,
-      'number':number,
-      'vaild_till':formattedDate,
-      'front':photoUri,
-      'type':'puc'
-    }    
-    try {
-      const response = await documentService.createDocument(param);       
-      if (response && response.status === 200) {
-        const createdDoc = response.data; 
-        navigation.navigate('PreviewPuc', { doc: createdDoc });     
-       }
-    }catch(error){
-      console.log(error);
+  useEffect(() => {
+    if (doc?.vaild_till) {
+      const formatted = moment(doc.vaild_till).format('DD-MM-YYYY');
+      setValidity(formatted);
     }
-    // navigation.navigate('EditForm');
-  }
+  }, []);
+  const parseDate = (dateString) => {
+    if (dateString.includes('-')) {
+      const [day, month, year] = dateString.split('-');
+      return new Date(`${year}-${month}-${day}`);
+    } else {
+      return new Date(dateString); // ISO fallback
+    }
+  };
 
-  const handleNext = () => {
+  const handleUpdate = async () => {
     if (!name || !number || !validity || !photoUri) {
-      Alert.alert("All fields are required.");
+      Alert.alert('Validation Error', 'All fields are required.');
       return;
     }
-  
-    const previewDoc = {
+    const param = {
+      id: doc._id,
       name,
       number,
-      vaild_till: moment(validity, 'DD-MM-YYYY').format('YYYY-MM-DD'),
+      vaild_till: validity,
       front: photoUri,
-      status: 0
+      type: 'insurance',
     };
-    navigation.navigate('PreviewPuc', { doc: previewDoc, fromForm: true });
+
+    try {
+      const response = await documentService.createDocument(param);
+      if (response && response.status === 200) {
+        navigation.navigate('PreviewInsurance', { doc: response.data });
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Error', 'Failed to update insurance data.');
+    }
   };
+
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -94,35 +108,28 @@ const PucForm = ({navigation}) => {
         <Text style={styles.label}>Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Name"
-          placeholderTextColor="#999"
+          placeholder="Enter name"
           value={name}
           onChangeText={setName}
-          returnKeyType="next"
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>PUC Number</Text>
+        <Text style={styles.label}>Insurance No</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter PUC Nmber"
-          placeholderTextColor="#999"
+          placeholder="Enter insurance number"
           value={number}
           onChangeText={setNumber}
-          autoCapitalize="characters"
-          returnKeyType="next"
-          maxLength={10}
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Valid Till</Text>
+        <Text style={styles.label}>Period of Insurance</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <TextInput
             style={styles.input}
             placeholder="Enter validity date"
-            placeholderTextColor="#999"
             value={validity}
             editable={false}
             pointerEvents="none"
@@ -132,7 +139,7 @@ const PucForm = ({navigation}) => {
 
       {showDatePicker && (
         <DateTimePicker
-          value={validity ? new Date(validity) : new Date()}
+          value={validity ? parseDate(validity) : new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={handleDateChange}
@@ -141,9 +148,17 @@ const PucForm = ({navigation}) => {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Front Photo</Text>
-        <TouchableOpacity onPress={openCamera} activeOpacity={0.7}>
+        <TouchableOpacity onPress={openCamera}>
           {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photo} />
+            <Image
+              source={{
+                uri:
+                  photoUri.startsWith('file://') || photoUri.startsWith('content://')
+                    ? photoUri
+                    : `${enviournment.imgUrl}${photoUri}`,
+              }}
+              style={styles.photo}
+            />
           ) : (
             <View style={[styles.input, styles.photoPlaceholder]}>
               <Text style={{ color: '#999' }}>Tap to open camera</Text>
@@ -152,11 +167,8 @@ const PucForm = ({navigation}) => {
         </TouchableOpacity>
       </View>
 
-      {/* <TouchableOpacity style={styles.btnBox} onPress={handleButton}>
-        <Text style={styles.btnText}>Submit</Text>
-      </TouchableOpacity> */}
-      <TouchableOpacity style={styles.btnBox} onPress={handleNext}>
-        <Text style={styles.btnText}>Next</Text>
+      <TouchableOpacity style={styles.btnBox} onPress={handleUpdate}>
+        <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -164,7 +176,7 @@ const PucForm = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow:1,
+    flexGrow: 1,
     padding: 20,
     backgroundColor: '#fff',
   },
@@ -201,17 +213,16 @@ const styles = StyleSheet.create({
   },
   btnBox: {
     backgroundColor: '#5F259F',
-    padding:20,
-    borderRadius:20,
+    padding: 20,
+    borderRadius: 20,
     alignItems: 'center',
-    top:25
+    top: 25,
   },
   btnText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
-   
-  }
+  },
 });
 
-export default PucForm;
+export default EditInsuranceForm;

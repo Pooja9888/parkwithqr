@@ -112,7 +112,7 @@ dependencies {
     implementation project(':twilio_voice-react-native-sdk') // Updated to match settings.gradle
     implementation("com.facebook.react:react-android")
     implementation project(':react-native-vector-icons')
-    implementation 'com.google.firebase:firebase-messaging:24.1.1' // or latest stable
+    implementation 'com.google.firebase:firebase-messaging:24.1.1' 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

@@ -20,7 +20,7 @@ function Notification() {
   const notificationList = async () => {
     try {
       const data = await notificationService.notications('get_notification');
-      console.log(data.data.data);
+      console.log(data.data.data,'data.data.datadata.data.data');
       
       setNotifications(data.data.data);
     } catch (error) {
@@ -215,3 +215,163 @@ deleteButton: {
   padding: 10,
 },
 });
+
+
+
+
+// import React from 'react';
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   SafeAreaView,
+//   FlatList,
+//   Image,
+//   Dimensions,
+// } from 'react-native';
+
+// const { width } = Dimensions.get('window');
+
+// const notifications = [
+//   {
+//     id: '1',
+//     type: 'fastag',
+//     title: 'FASTag Low Balance Alert',
+//     description: 'Your FASTag balance is below ₹100. Please recharge to avoid toll issues.',
+//     time: '5 mins ago',
+//   },
+//   {
+//     id: '2',
+//     type: 'puc',
+//     title: 'PUC Certificate Expiry',
+//     description: 'Your Pollution Under Control (PUC) certificate will expire in 3 days. Please renew it.',
+//     time: 'Today, 9:00 AM',
+//   },
+//   {
+//     id: '3',
+//     type: 'rc',
+//     title: 'RC Renewal Reminder',
+//     description: 'Your Vehicle Registration Certificate is due for renewal this month.',
+//     time: 'Yesterday',
+//   },
+//   {
+//     id: '4',
+//     type: 'dl',
+//     title: 'Driving License Expiry',
+//     description: 'Your driving license will expire soon. Apply for renewal to avoid penalty.',
+//     time: '2 days ago',
+//   },
+//   {
+//     id: '5',
+//     type: 'servicing',
+//     title: 'Vehicle Servicing Due',
+//     description: 'It’s time for your vehicle’s scheduled servicing. Book your slot today.',
+//     time: '3 days ago',
+//   },
+// ];
+
+
+// const getTypeColor = (type) => {
+//   switch (type) {
+//     case 'fastag': return '#64CFFA';
+//     case 'puc': return '#f39c12';
+//     case 'rc': return '#9b59b6';
+//     case 'dl': return '#D8598E';
+//     case 'servicing': return '#2ecc71';
+//     default: return '#ccc';
+//   }
+// };
+
+// const Notification = () => {
+//   const renderItem = ({ item }) => {
+//     return (
+//       <View style={styles.card}>
+//         <View style={[styles.avatar, { backgroundColor: getTypeColor(item.type) }]}>
+//           <Text style={styles.avatarText}>{item.type.charAt(0).toUpperCase()}</Text>
+//         </View>
+//         <View style={styles.cardContent}>
+//           <Text style={styles.title}>{item.title}</Text>
+//           <Text style={styles.description}>{item.description}</Text>
+//           <Text style={styles.time}>{item.time}</Text>
+//         </View>
+//       </View>
+//     );
+//   };
+
+//   return (
+//     <SafeAreaView style={styles.safe}>
+//       <Text style={styles.header}>Notifications</Text>
+//       <FlatList
+//         data={notifications}
+//         keyExtractor={(item) => item.id}
+//         renderItem={renderItem}
+//         contentContainerStyle={styles.listContainer}
+//         showsVerticalScrollIndicator={false}
+//       />
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   safe: {
+//     flex: 1,
+//     backgroundColor: '#f5f7fa',
+//   },
+//   header: {
+//     fontSize: 22,
+//     fontWeight: 'bold',
+//     color: '#0179a2',
+//     paddingHorizontal: 20,
+//     paddingTop: 20,
+//     paddingBottom: 10,
+//   },
+//   listContainer: {
+//     paddingHorizontal: 16,
+//     paddingBottom: 20,
+//   },
+//   card: {
+//     flexDirection: 'row',
+//     backgroundColor: '#fff',
+//     borderRadius: 12,
+//     padding: 12,
+//     marginBottom: 12,
+//     shadowColor: '#000',
+//     shadowOpacity: 0.05,
+//     shadowOffset: { width: 0, height: 1 },
+//     shadowRadius: 3,
+//     elevation: 2,
+//   },
+//   avatar: {
+//     width: 42,
+//     height: 42,
+//     borderRadius: 21,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     marginRight: 12,
+//   },
+//   avatarText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     fontSize: 16,
+//   },
+//   cardContent: {
+//     flex: 1,
+//   },
+//   title: {
+//     fontSize: 15,
+//     fontWeight: '600',
+//     color: '#333',
+//   },
+//   description: {
+//     fontSize: 13,
+//     color: '#555',
+//     marginTop: 4,
+//   },
+//   time: {
+//     fontSize: 12,
+//     color: '#999',
+//     marginTop: 6,
+//   },
+// });
+
+// export default Notification;

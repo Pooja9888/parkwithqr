@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "363461071167",
-    "project_id": "parkwithqr-b3afb",
-    "storage_bucket": "parkwithqr-b3afb.firebasestorage.app"
+    "project_number": "565664549024",
+    "project_id": "parkwithqr-40be6",
+    "storage_bucket": "parkwithqr-40be6.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:363461071167:android:d3abb0a860de2ba96a838a",
+        "mobilesdk_app_id": "1:565664549024:android:fb7e993d1b9cd67118a1c5",
         "android_client_info": {
           "package_name": "com.parkwithqr"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAyCRSgN8VECpkPNKJOATTzVSmDiDYbrr0"
+          "current_key": "AIzaSyBRx1nq0UbRDlykRhe0K3fLLDmYeIYNrcU"
         }
       ],
       "services": {

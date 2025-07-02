@@ -22,7 +22,6 @@ serviceWorker._requestPostToken = async (url, payload, token) => {
            },
             body: JSON.stringify(payload)
         });
-        console.log(res.status, 'Response Status'); // Log HTTP status
 
         const data = await res.json();                
         resolve(data);

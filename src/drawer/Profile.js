@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import serviceWorker from '../services/serviceWorker';
-import { webUrl } from '../generic/webUrl';
 import asyncStorage from '../generic/storage';
-import { genericEnum, statusCode } from '../generic/genericEnum';
-import Toast from 'react-native-toast-message';
-
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -16,13 +17,6 @@ const Profile = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [vehicleNumber, setVehicleNumber] = useState('');
 
-  const showToast = (message, type) => {
-    Toast.show({
-      type,
-      position: 'top',
-      text1: message,
-    });
-  };
   useEffect(() => {
     const loadProfile = async () => {
       const storedName = await asyncStorage.getItem('name');
@@ -38,77 +32,35 @@ const Profile = () => {
     return unsubscribe;
   }, [navigation]);
 
-  const handleEditProfile = () => {
-    navigation.navigate('EditProfileScreen', {
-      name,
-      phoneNumber,
-      vehicleNumber
-    });
-  };
-
-
-  const handleDeleteProfile = async () => {
-    Alert.alert('Delete Account', 'Are you sure you want to delete your account?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            const uuid = await asyncStorage.getItem('uuid');
-            const token = await asyncStorage.getItem('accessToken');
-
-            if (!uuid || !token) {
-              return;
-            }
-            const params = { uuid };
-            const response = await serviceWorker._requestPostToken(webUrl.deleteAccount, params, token);
-            if (response.status === statusCode.success) {       
-              showToast(response.message,'success')
-              clearStorage()
-              navigation.navigate(genericEnum.login);
-            } else {
-              showToast(response.message || 'Login failed', 'error');
-            }
-
-            setName('');
-            setPhoneNumber('');
-            setVehicleNumber('');
-          } catch (error) {
-            console.error('Delete Profile Error:', error);
-          }
-        },
-      },
-    ]);
-};
-const clearStorage = async () => {
-  try {
-    await asyncStorage.clear();
-  } catch (error) {
-    console.error('Error clearing storage:', error);
-  }
-};
-
   return (
-    <LinearGradient colors={['#f2f2f2', '#e6e6e6']} style={styles.container}>
+    <LinearGradient colors={['#5F259F', '#bc82fa']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.profilePictureContainer}>
-          <Image source={{ uri: 'https://www.w3schools.com/howto/img_avatar.png' }} style={styles.profilePicture} />
-        </View>
-        <View style={styles.profileDetails}>
-          <Text style={styles.name}>{name || 'No Name'}</Text>
-          <Text style={styles.phone}>{phoneNumber || 'No Phone Number'}</Text>
-          <Text style={styles.phone}>{vehicleNumber || 'No Vehicle Number'}</Text>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
-            <Icon name="edit" size={20} color="#fff" />
-            <Text style={styles.buttonText}>Edit Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDeleteProfile}>
-            <Icon name="trash" size={20} color="#fff" />
-            <Text style={styles.buttonText}>Delete Account</Text>
-          </TouchableOpacity>
+        {/* Avatar with Gradient Ring */}
+        <LinearGradient colors={['#ffffff', '#5F259F']} style={styles.avatarRing}>
+          <Image
+            source={{ uri: 'https://www.w3schools.com/howto/img_avatar.png' }}
+            style={styles.profilePicture}
+          />
+        </LinearGradient>
+
+        {/* Glass-effect Profile Card */}
+        <View style={styles.profileCard}>
+          <Text style={styles.heading}>My Profile</Text>
+
+          <View style={styles.detailRow}>
+            <Icon name="user" size={20} color="#5F259F" />
+            <Text style={styles.detailText}>{name}</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Icon name="phone" size={20} color="#5F259F" />
+            <Text style={styles.detailText}>{phoneNumber}</Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Icon name="truck" size={20} color="#5F259F" />
+            <Text style={styles.detailText}>{vehicleNumber}</Text>
+          </View>
         </View>
       </ScrollView>
     </LinearGradient>
@@ -118,65 +70,65 @@ const clearStorage = async () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 30,
-    paddingHorizontal: 20
   },
   content: {
+    paddingTop: 80,
+    alignItems: 'center',
+    paddingHorizontal: 20,
     paddingBottom: 40,
-    alignItems: 'center'
   },
-  profilePictureContainer: {
+  avatarRing: {
+    borderRadius: 90,
+    padding: 5,
+    backgroundColor: '#fff',
     marginBottom: 20,
-    borderWidth: 4,
-    borderColor: '#fff',
-    borderRadius: 100,
-    overflow: 'hidden'
   },
   profilePicture: {
     width: 120,
     height: 120,
-    borderRadius: 60
+    borderRadius: 70,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
-  profileDetails: {
-    marginBottom: 30,
-    alignItems: 'center'
+  profileCard: {
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 25,
+    padding: 25,
+    backdropFilter: 'blur(15px)', // iOS only: Android will ignore
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    // elevation: 0.1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    // shadowRadius: 10,
   },
-  name: {
+  heading: {
     fontSize: 26,
-    color: '#5F259F',
-    marginBottom: 5,
-    padding: 3,
-    fontWeight: '600'
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 20,
   },
-  phone: {
-    fontSize: 16,
-    color: '#555',
-    padding: 3,
-    fontWeight: '600'
-
-  },
-  buttonContainer: {
-    width: '80%',
-    marginBottom: 20
-  },
-  button: {
+  detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#5F259F',
-    paddingVertical: 15,
-    borderRadius: 30,
-    marginBottom: 10,
-    elevation: 5
+    backgroundColor: '#ffffffcc',
+    width: '100%',
+    borderRadius: 15,
+    padding: 12,
+    marginVertical: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 1, height: 2 },
+    shadowRadius: 4,
   },
-  buttonText: {
-    color: '#fff',
+  detailText: {
     fontSize: 18,
+    color: '#333',
     marginLeft: 10,
-    fontWeight: '600'
-  },
-  deleteButton: {
-    backgroundColor: '#fa4c4c'
+    fontWeight: '600',
   },
 });
 

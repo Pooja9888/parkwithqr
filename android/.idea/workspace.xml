@@ -5,19 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2cac33b4-4723-42c2-9f49-45da91398f9b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../Archive.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../metro.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../metro.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/google-services.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../src/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/AppNavigator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/drawer/DrawerNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/drawer/DrawerNavigator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/generic/genericEnum.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/generic/genericEnum.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/assets/images/edit.png" beforeDir="false" afterPath="$PROJECT_DIR$/../src/assets/images/edit.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/const/images.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/const/images.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/drawer/CustomDrawer.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/drawer/CustomDrawer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/drawer/Profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/drawer/Profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/drawer/TermsConditions.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/drawer/TermsConditions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/generic/enviournment.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/generic/enviournment.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../src/generic/webUrl.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/generic/webUrl.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/DrivingLicenceForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/DrivingLicenceForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/EditForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/EditForm.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../src/screen/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/HomeScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/screen/Signup.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/Signup.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../src/splash/Splash.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/splash/Splash.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../yarn.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/InsuranceForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/InsuranceForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/Notification.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/Notification.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/PucForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/PucForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/RcForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/RcForm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/screen/Settings.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/screen/Settings.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/services/callService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/services/callService.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/services/serviceWorker.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/services/serviceWorker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../src/tabNavigator/ScanQR.js" beforeDir="false" afterPath="$PROJECT_DIR$/../src/tabNavigator/ScanQR.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

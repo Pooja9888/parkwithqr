@@ -11,7 +11,10 @@ const webUrl = {
     updateProfile: `updateProfile`,
     deleteAccount: `deleteAccount`,
     callToken: `token`,
-    notification: `notifications`
+    notification: `notifications`,
+    document:`createDocument`,
+    sendMessage:`sendMessage`,
+    deleteAccount: `deleteAccount`
 
 };
 

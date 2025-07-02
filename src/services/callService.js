@@ -44,8 +44,7 @@ const callService = {
             const params = {
                 vehical_no: vehical_no,
                 uuid: uuid
-            }      
-         
+            }                  
             const response = await serviceWorker._requestPostToken(webUrl.inboundCall,params,await asyncStorage.getItem("accessToken"));             
             return response;
         } catch (error) {

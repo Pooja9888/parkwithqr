@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
+import { requestCameraPermission } from '../utils/cameraPermission';
+import documentService from '../services/documentService';
+import { genericEnum } from '../generic/genericEnum';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-const RcForm = () => {
+const RcForm = ({navigation}) => {
   const [name, setName] = useState('');
-  const [pucCode, setPucCode] = useState('');
+  const [number, setNumber] = useState('');
   const [validity, setValidity] = useState('');
-  const [photoUri, setPhotoUri] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [frontPhotoUri, setFrontPhotoUri] = useState(null);
+  const [backPhotoUri, setBackPhotoUri] = useState(null);
 
-  const openCamera = () => {
+  const openCamera = async (type) => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert('Permission Denied', 'Camera access is required to take photos.');
+      return;
+    }
     launchCamera(
       {
         mediaType: 'photo',
@@ -21,14 +32,61 @@ const RcForm = () => {
         } else if (response.errorCode) {
           console.log('Camera Error: ', response.errorMessage);
         } else {
-          // response.assets is an array, take first asset's uri
-          const uri = response.assets && response.assets[0].uri;
-          setPhotoUri(uri);
+          const uri = response.assets?.[0]?.uri;
+          if (type === 'front') {
+            setFrontPhotoUri(uri);
+          } else if (type === 'back') {
+            setBackPhotoUri(uri);
+          }
         }
       }
     );
   };
-
+  // handleButton = async () => {
+  //   const param = {
+  //     'name': name,
+  //     'number': number,
+  //     'vaild_till': validity,
+  //     'front': frontPhotoUri,
+  //     'back': backPhotoUri,
+  //     'type': 'rc'
+  //   }
+  //   try {
+  //     const response = await documentService.createDocument(param);
+  //     if (response && response.status === 200) {
+  //       const createdDoc = response.data;
+  //       navigation.navigate('PreviewRc', { doc: createdDoc });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+  const handleNext = () => {
+    if (!name || !number || !validity || !frontPhotoUri || !backPhotoUri) {
+      Alert.alert("All fields are required.");
+      return;
+    }
+  
+    const previewDoc = {
+      name,
+      number,
+      vaild_till: validity,
+      front: frontPhotoUri,
+      back: backPhotoUri,
+      status: 0
+    };
+       navigation.navigate('PreviewRc', { doc: previewDoc, fromForm: true });
+  };
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const day = selectedDate.getDate().toString().padStart(2, '0');
+      const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+      const year = selectedDate.getFullYear();
+      const formattedDate = `${day}-${month}-${year}`;
+      setValidity(formattedDate);
+    }
+  };
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.inputGroup}>
@@ -49,8 +107,8 @@ const RcForm = () => {
           style={styles.input}
           placeholder="Enter PUC code"
           placeholderTextColor="#999"
-          value={pucCode}
-          onChangeText={setPucCode}
+          value={number}
+          onChangeText={setNumber}
           autoCapitalize="characters"
           returnKeyType="next"
         />
@@ -58,21 +116,32 @@ const RcForm = () => {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Reg Vaildity</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter validity date"
-          placeholderTextColor="#999"
-          value={validity}
-          onChangeText={setValidity}
-          returnKeyType="done"
-        />
+        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter validity date"
+            placeholderTextColor="#999"
+            value={validity}
+            editable={false}
+            pointerEvents="none"
+          />
+        </TouchableOpacity>
       </View>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={validity ? new Date(validity) : new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+        />
+      )}
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Front Photo</Text>
-        <TouchableOpacity onPress={openCamera} activeOpacity={0.7}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photo} />
+        <TouchableOpacity onPress={() => openCamera('front')} activeOpacity={0.7}>
+          {frontPhotoUri ? (
+            <Image source={{ uri: frontPhotoUri }} style={styles.photo} />
           ) : (
             <View style={[styles.input, styles.photoPlaceholder]}>
               <Text style={{ color: '#999' }}>Tap to open camera</Text>
@@ -83,9 +152,9 @@ const RcForm = () => {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Back Photo</Text>
-        <TouchableOpacity onPress={openCamera} activeOpacity={0.7}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photo} />
+        <TouchableOpacity onPress={() => openCamera('back')} activeOpacity={0.7}>
+          {backPhotoUri ? (
+            <Image source={{ uri: backPhotoUri }} style={styles.photo} />
           ) : (
             <View style={[styles.input, styles.photoPlaceholder]}>
               <Text style={{ color: '#999' }}>Tap to open camera</Text>
@@ -93,13 +162,17 @@ const RcForm = () => {
           )}
         </TouchableOpacity>
       </View>
+
+       <TouchableOpacity style={styles.btnBox} onPress={handleNext}>
+        <Text style={styles.btnText}>Next</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow:1,
+    flexGrow: 1,
     padding: 20,
     backgroundColor: '#fff',
   },
@@ -134,6 +207,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 50,
   },
+  btnBox: {
+    backgroundColor: '#5F259F',
+    padding: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    top: 25
+  },
+  btnText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+
+  }
 });
 
 export default RcForm;

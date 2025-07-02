@@ -1,20 +1,23 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Modal } from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import asyncStorage from '../generic/storage';
+import images from '../const/images';
+import LinearGradient from 'react-native-linear-gradient';
 
 const CustomDrawer = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [vehicleNumber, setVehicleNumber] = useState('');
+  const [profilePicUri, setProfilePicUri] = useState('https://www.w3schools.com/howto/img_avatar.png');
 
 
   const handleLogout = () => {
     setModalVisible(false);
     navigation.navigate('Login'); // Redirect to Login after logout
   };
-  
+
   useEffect(() => {
     const loadProfile = async () => {
       const storedName = await asyncStorage.getItem('name');
@@ -30,20 +33,28 @@ const CustomDrawer = ({ navigation }) => {
 
 
   const menuOptions = [
-    { id: 2, name: 'Profile', icon: require('../assets/images/profile.png'), route: 'Profile' },
-    // { id: 3, name: 'Settings', icon: require('../assets/images/gear.png'), route: 'Settings' },
-    { id: 4, name: 'Terms & Conditions', icon: require('../assets/images/faq.png'), route: 'TermsConditions' },
-    { id: 5, name: 'Logout', icon: require('../assets/images/logout.png'), route: 'Logout' },
+    // { id: 1, name: 'Profile', icon: require('../assets/images/profile.png'), route: 'Profile' },
+    { id: 2, name: 'Terms & Conditions', icon: require('../assets/images/faq.png'), route: 'TermsConditions' },
+    { id: 3, name: 'RefundPolicy', icon: require('../assets/images/refund.png'), route: 'RefundPolicy' },
+    { id: 4, name: 'PrivacyPolicy', icon: require('../assets/images/privacyPolicy.png'), route: 'PrivacyPolicy' },
+    { id: 5, name: 'Settings', icon: require('../assets/images/setting.png'), route: 'Settings' },
+    { id: 6, name: 'Logout', icon: require('../assets/images/logout.png'), route: 'Logout' },
   ];
+
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: 'transparent' }}>
       <DrawerContentScrollView>
         <View style={styles.headerContainer}>
-          <Image source={require('../assets/images/user.png')} style={styles.avatar} />
-          <Text style={styles.username}>{name}</Text>
-          <Text style={styles.useremail}>{phoneNumber}</Text>
-          <Text style={styles.useremail}>{vehicleNumber}</Text>
+        <LinearGradient colors={['#ffffff', '#5F259F']} style={styles.avatarRing}>
+              <Image source={{ uri: profilePicUri }} style={styles.profilePicture} />
+            </LinearGradient>
+          <Text style={styles.username}>{capitalizeFirstLetter(name)}</Text>
+          <Text style={styles.userText}>{phoneNumber}</Text>
+          <Text style={styles.userText}>{vehicleNumber}</Text>
         </View>
         <View style={styles.menuContainer}>
           {menuOptions.map((item) => (
@@ -64,7 +75,7 @@ const CustomDrawer = ({ navigation }) => {
           ))}
         </View>
       </DrawerContentScrollView>
-      <DrawerItem label="Version 1.0.0" labelStyle={styles.versionText} onPress={() => {}} />
+      <DrawerItem label="Version 1.0.0" labelStyle={styles.versionText} onPress={() => { }} />
       {/* Logout Confirmation Modal */}
       <Modal transparent={true} visible={modalVisible} animationType="fade">
         <View style={styles.modalContainer}>
@@ -95,19 +106,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   avatar: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     borderRadius: 40,
     marginBottom: 10,
   },
   username: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
   },
-  useremail: {
+  userText: {
     color: '#ccc',
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '600'
   },
   menuContainer: {
     marginTop: 20,
@@ -173,5 +185,19 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  avatarRing: {
+    borderRadius: 90,
+    padding: 5,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    width: 130,
+  },
+  profilePicture: {
+    width: 120,
+    height: 120,
+    borderRadius: 70,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
 });

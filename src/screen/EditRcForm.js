@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text, ScrollView, TouchableOpacity, Image,Alert } from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
 import { requestCameraPermission } from '../utils/cameraPermission';
 import documentService from '../services/documentService';
+import { enviournment } from '../generic/enviournment';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { genericEnum } from '../generic/genericEnum';
-import { axiosGetToken } from '../services/axiosService';
-import { webUrl } from '../generic/webUrl';
-import moment from 'moment';
+import moment from 'moment'; 
 
-const PucForm = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const [validity, setValidity] = useState('');
+const EditRcForm =  ({ navigation, route }) => {
+  const { doc } = route.params;
+  
+  const [name, setName] = useState(doc?.name || '');
+  const [number, setNumber] = useState(doc?.number || '');
+  const [validity, setValidity] = useState(doc?.vaild_till || '');
+  const [frontPhotoUri, setFrontPhotoUri] = useState(doc?.front || '');
+  const [backPhotoUri, setBackPhotoUri] = useState(doc?.back || '');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [photoUri, setPhotoUri] = useState(null);
 
-  const openCamera = async () => {
+  const openCamera = async (type) => {
     const hasPermission = await requestCameraPermission();
     if (!hasPermission) {
       Alert.alert('Permission Denied', 'Camera access is required to take photos.');
@@ -34,49 +35,55 @@ const PucForm = ({navigation}) => {
         } else if (response.errorCode) {
           console.log('Camera Error: ', response.errorMessage);
         } else {
-          const uri = response.assets && response.assets[0].uri;
-          setPhotoUri(uri);
+            const uri = response.assets?.[0]?.uri;
+            if (type === 'front') {
+              setFrontPhotoUri(uri);
+            } else if (type === 'back') {
+              setBackPhotoUri(uri);
+            }
         }
       }
     );
   };
-  handleButton= async ()=>{
-    const formattedDate = moment(validity, 'DD-MM-YYYY').format('YYYY-MM-DD');
+  useEffect(() => {
+    if (doc?.vaild_till) {
+      const formatted = moment(doc.vaild_till).format('DD-MM-YYYY');
+      setValidity(formatted);
+    }
+  }, []);
+  const parseDate = (dateString) => {
+    if (dateString.includes('-')) {
+      const [day, month, year] = dateString.split('-');
+      return new Date(`${year}-${month}-${day}`);
+    } else {
+      return new Date(dateString); // ISO fallback
+    }
+  };
 
-    const param ={
+  handleUpdate= async ()=>{
+    if (!name || !number || !validity || !frontPhotoUri || !backPhotoUri) {
+      Alert.alert('Validation Error', 'All fields are required.');
+      return;
+    }
+    const param = {
+      id: doc._id, 
       'name':name,
       'number':number,
-      'vaild_till':formattedDate,
-      'front':photoUri,
-      'type':'puc'
+      'vaild_till':validity,
+      'front':frontPhotoUri,
+      'back':backPhotoUri,
+      'type':'rc'
     }    
     try {
-      const response = await documentService.createDocument(param);       
+      const response = await documentService.createDocument(param); 
       if (response && response.status === 200) {
-        const createdDoc = response.data; 
-        navigation.navigate('PreviewPuc', { doc: createdDoc });     
-       }
+        navigation.navigate('PreviewRc', { doc: response.data });
+      }
+       
     }catch(error){
       console.log(error);
     }
-    // navigation.navigate('EditForm');
   }
-
-  const handleNext = () => {
-    if (!name || !number || !validity || !photoUri) {
-      Alert.alert("All fields are required.");
-      return;
-    }
-  
-    const previewDoc = {
-      name,
-      number,
-      vaild_till: moment(validity, 'DD-MM-YYYY').format('YYYY-MM-DD'),
-      front: photoUri,
-      status: 0
-    };
-    navigation.navigate('PreviewPuc', { doc: previewDoc, fromForm: true });
-  };
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -87,42 +94,34 @@ const PucForm = ({navigation}) => {
       setValidity(formattedDate);
     }
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Name"
-          placeholderTextColor="#999"
+          placeholder="Enter name"
           value={name}
           onChangeText={setName}
-          returnKeyType="next"
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>PUC Number</Text>
+        <Text style={styles.label}>Reg No</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter PUC Nmber"
-          placeholderTextColor="#999"
+          placeholder="Enter PUC code"
           value={number}
           onChangeText={setNumber}
-          autoCapitalize="characters"
-          returnKeyType="next"
-          maxLength={10}
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Valid Till</Text>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+        <Text style={styles.label}>Reg Vaildity</Text>
+         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <TextInput
             style={styles.input}
             placeholder="Enter validity date"
-            placeholderTextColor="#999"
             value={validity}
             editable={false}
             pointerEvents="none"
@@ -132,7 +131,7 @@ const PucForm = ({navigation}) => {
 
       {showDatePicker && (
         <DateTimePicker
-          value={validity ? new Date(validity) : new Date()}
+          value={validity ? parseDate(validity) : new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={handleDateChange}
@@ -141,9 +140,12 @@ const PucForm = ({navigation}) => {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Front Photo</Text>
-        <TouchableOpacity onPress={openCamera} activeOpacity={0.7}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photo} />
+        <TouchableOpacity onPress={() => openCamera('front')} activeOpacity={0.7}>
+            {frontPhotoUri ? (
+            <Image
+            source={{ uri: frontPhotoUri.startsWith('file://') || frontPhotoUri.startsWith('content://') ? frontPhotoUri : `${enviournment.imgUrl}${frontPhotoUri}` }}
+            style={styles.photo}
+          />    
           ) : (
             <View style={[styles.input, styles.photoPlaceholder]}>
               <Text style={{ color: '#999' }}>Tap to open camera</Text>
@@ -152,11 +154,23 @@ const PucForm = ({navigation}) => {
         </TouchableOpacity>
       </View>
 
-      {/* <TouchableOpacity style={styles.btnBox} onPress={handleButton}>
-        <Text style={styles.btnText}>Submit</Text>
-      </TouchableOpacity> */}
-      <TouchableOpacity style={styles.btnBox} onPress={handleNext}>
-        <Text style={styles.btnText}>Next</Text>
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Back Photo</Text>
+        <TouchableOpacity  onPress={() => openCamera('back')}  activeOpacity={0.7}>
+          {backPhotoUri ? (
+            <Image
+            source={{ uri: backPhotoUri.startsWith('file://') || backPhotoUri.startsWith('content://') ? backPhotoUri : `${enviournment.imgUrl}${backPhotoUri}` }}
+            style={styles.photo}
+          />    
+          ) : (
+            <View style={[styles.input, styles.photoPlaceholder]}>
+              <Text style={{ color: '#999' }}>Tap to open camera</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.btnBox} onPress={handleButton}>
+        <Text style={styles.btnText}>Update</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -214,4 +228,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PucForm;
+export default EditRcForm;
